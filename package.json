@@ -1,7 +1,7 @@
 {
   "name": "learnstorybook-design-system-template",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "files": [
@@ -17,7 +17,8 @@
     "release": "yarn build && auto shipit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "chromatic": "npx chromatic --project-token=chpt_8f291a1c5d2a8f6"
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
