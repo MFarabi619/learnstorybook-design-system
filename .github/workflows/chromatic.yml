@@ -10,15 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     # The list of steps that the action will go through
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           #👇 Fetches all history so Chromatic can compare against previous builds
           fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           #👇 Sets the version of Node.js to use
-          node-version: 16
-      - run: yarn
+          node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - run: pnpm i
         #👇 Adds Chromatic as a step in the workflow
       - uses: chromaui/action@v1
         # Options required for Chromatic's GitHub Action
