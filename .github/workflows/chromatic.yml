@@ -10,6 +10,41 @@ jobs:
     runs-on: ubuntu-latest
     # The list of steps that the action will go through
     steps:
+      - uses: actions/checkout@v3
+        with:
+          #👇 Fetches all history so Chromatic can compare against previous builds
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v3
+        with:
+          #👇 Sets the version of Node.js to use
+          node-version: 20
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - run: pnpm i
+
+      - name: Install Playwright
+        run: pnpm dlx playwright install --with-deps
+
+      - name: Build Storybook
+        run: pnpm build-storybook --quiet
+
+      - name: Start Storybook HTTP server
+        run: pnpm dlx http-server storybook-static --port 6006 &
+
+      - name: Wait for Storybook to be ready
+        run: pnpm dlx wait-on tcp:6006
+
+      - name: Run Storybook tests
+        run: pnpm test-storybook
+
+  visual-tests:
+    # The operating system it will run on
+    runs-on: ubuntu-latest
+    # The list of steps that the action will go through
+    steps:
       - uses: actions/checkout@v2
         with:
           #👇 Fetches all history so Chromatic can compare against previous builds
@@ -17,8 +52,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           #👇 Sets the version of Node.js to use
-          node-version: 16
-      - run: yarn
+          node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - run: pnpm i
         #👇 Adds Chromatic as a step in the workflow
       - uses: chromaui/action@v1
         # Options required for Chromatic's GitHub Action
