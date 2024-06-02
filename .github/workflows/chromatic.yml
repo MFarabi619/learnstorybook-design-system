@@ -14,23 +14,31 @@ jobs:
         with:
           #👇 Fetches all history so Chromatic can compare against previous builds
           fetch-depth: 0
+
       - uses: actions/setup-node@v3
         with:
           #👇 Sets the version of Node.js to use
           node-version: 20
+
       - uses: pnpm/action-setup@v4
         with:
           version: 9
       - run: pnpm i
+
       - name: Install Playwright
         run: pnpm dlx playwright install --with-deps
+
       - name: Build Storybook
         run: pnpm build-storybook --quiet
-      - name: Serve Storybook and run tests
-        run: |
-          pnpm dlx concurrently -k -s first -n "SB,TEST" -c "magenta,blue"\
-          "npx http-server storybook-static --port 6006 --silent"\
-          "npx wait-on tcp:6006 && yarn test-storybook"
+
+      - name: Start Storybook HTTP server
+        run: pnpm dlx http-server storybook-static --port 6006 &
+
+      - name: Wait for Storybook to be ready
+        run: pnpm dlx wait-on tcp:6006
+
+      - name: Run Storybook tests
+        run: pnpm test-storybook
 
   visual-tests:
     # The operating system it will run on
@@ -45,6 +53,9 @@ jobs:
         with:
           #👇 Sets the version of Node.js to use
           node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - run: pnpm i
         #👇 Adds Chromatic as a step in the workflow
       - uses: chromaui/action@v1
